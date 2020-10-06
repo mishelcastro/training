@@ -1,0 +1,31 @@
+let num = 103.941
+//console.log(num.toFixed(10))
+
+//docs on math https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math
+
+
+console.log(Math.round(num))
+//rounds down
+console.log(Math.floor(num))
+//rounds up
+console.log(Math.ceil(num))
+
+////let min = 0
+//let max = 1
+//let randomNum = Math.floor(Math.random() * (max-min +1)) + min
+//console.log(randomNum)
+
+
+//challenge area
+//1-5 - true if correct, false if not 
+ 
+let makeGuess = function(guess){
+    let min = 1
+    let max = 5
+    let randomNum = Math.floor(Math.random() * (max - min + 1)) + min
+    console.log(randomNum)
+     return guess === randomNum
+
+}
+
+console.log(makeGuess(1)) 
