@@ -1,5 +1,7 @@
 let notes = getSavedNotes()
 
+// making a change
+
 const filters = {
     searchText: ''
 }
