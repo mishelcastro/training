@@ -1,0 +1,1105 @@
+You've started a new movie-rating website, and you've been collecting data on reviewers' ratings of various movies. There's not much data yet, but you can still try out some interesting queries. Here's the schema:
+
+Movie ( mID, title, year, director )
+English: There is a movie with ID number mID, a title, a release year, and a director.
+
+Reviewer ( rID, name )
+English: The reviewer with ID number rID has a certain name.
+
+Rating ( rID, mID, stars, ratingDate )
+English: The reviewer rID gave the movie mID a number of stars rating (1-5) on a certain ratingDate.
+
+Your queries will run over a small data set conforming to the schema. View the database (https://courses.edx.org/asset-v1:StanfordOnline+SOE.YDB-SQL0001+2T2020+type@asset+block/moviedata.html). (You can also download the schema and data - https://courses.edx.org/assets/courseware/v1/a922a24d869b2bed4b5002bae0ea8d9e/asset-v1:StanfordOnline+SOE.YDB-SQL0001+2T2020+type@asset+block/rating.sql)
+
+Instructions: Each problem asks you to write a query in SQL. To run your query against our back-end sample database using SQLite, click the "Submit" button. You will see a display of your query result and the expected result. If the results match, your query will be marked "correct". You may run as many queries as you like for each question.
+
+Important Notes:
+
+Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+Unless a specific result ordering is asked for, you can return the result rows in any order.
+You are to translate the English into a SQL query that computes the desired result over all possible databases. All we actually check is that your query gets the right answer on the small sample database. Thus, even if your solution is marked as correct, it is possible that your query does not correctly reflect the problem at hand. (For example, if we ask for a complex condition that requires accessing all of the tables, but over our small data set in the end the condition is satisfied only by Star Wars, then the query "select title from Movie where title = 'Star Wars'" will be marked correct even though it doesn't reflect the actual question.) Circumventing the system in this fashion will get you a high score on the exercises, but it won't help you learn SQL. On the other hand, an incorrect attempt at a general solution is unlikely to produce the right answer, so you shouldn't be led astray by our checking system.
+
+You may perform these exercises as many times as you like, so we strongly encourage you to keep working with them until you complete the exercises with full credit.
+
+Q1
+1/1 point (graded)
+Find the titles of all movies directed by Steven Spielberg.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+select title
+2
+from Movie
+3
+where director = "Steven Spielberg"
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q2
+1/1 point (graded)
+Find all years that have a movie that received a rating of 4 or 5, and sort them in increasing order.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+select distinct year
+2
+from Movie, Rating
+3
+where Movie.mId = Rating.mId and Rating.stars > 3 
+4
+order by year asc;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q3
+1/1 point (graded)
+Find the titles of all movies that have no ratings.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+select Movie.title
+2
+from Movie
+3
+where Movie.mID not in (select Rating.mId from Rating where Rating.mId = Movie.mId);
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q4
+1/1 point (graded)
+Some reviewers didn't provide a date with their rating. Find the names of all reviewers who have ratings with a NULL value for the date.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+select Reviewer.name
+2
+from Reviewer, Rating
+3
+where Reviewer.rId = Rating.rId and Rating.ratingDate is null;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q5
+1/1 point (graded)
+Write a query to return the ratings data in a more readable format: reviewer name, movie title, stars, and ratingDate. Also, sort the data, first by reviewer name, then by movie title, and lastly by number of stars.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+select distinct name, title, stars, ratingDate
+2
+from Movie, Reviewer, Rating
+3
+where Reviewer.rID = Rating.rId and Movie.mId = Rating.mID
+4
+order by Reviewer.name asc, Movie.title asc, Rating.stars asc
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q6
+1/1 point (graded)
+For all cases where the same reviewer rated the same movie twice and gave it a higher rating the second time, return the reviewer's name and the title of the movie.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT rev.name, m.title
+2
+FROM Reviewer rev
+3
+INNER JOIN Rating r1 on r1.rID = rev.rID
+4
+INNER JOIN Rating r2 on r2.rID = rev.rID and r2.mID = r1.mID
+5
+INNER JOIN Movie m on m.mID = r1.mID
+6
+WHERE r2.ratingDate > r1.ratingDate and r2.stars > r1.stars
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q7
+1/1 point (graded)
+For each movie that has at least one rating, find the highest number of stars that movie received. Return the movie title and number of stars. Sort by movie title.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT m.title, MAX(r.stars) AS max_rating
+2
+FROM rating r
+3
+LEFT JOIN movie m ON m.mID=r.mID
+4
+GROUP BY m.title;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q8
+1/1 point (graded)
+For each movie, return the title and the 'rating spread', that is, the difference between highest and lowest ratings given to that movie. Sort by rating spread from highest to lowest, then by movie title.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT m.title, (MAX(r.stars) - MIN(r.stars)) AS rating_spread
+2
+FROM rating r
+3
+LEFT JOIN movie m ON r.mID=m.mID
+4
+GROUP BY m.title
+5
+ORDER BY rating_spread DESC, m.title ASC;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q9
+1/1 point (graded)
+Find the difference between the average rating of movies released before 1980 and the average rating of movies released after 1980. (Make sure to calculate the average rating for each movie, then the average of those averages for movies before 1980 and movies after. Don't just calculate the overall average rating before and after 1980.)
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT AVG(Before1980.avg) - AVG(After1980.avg)
+2
+FROM (
+3
+  SELECT AVG(stars) AS avg
+4
+  FROM Movie
+5
+  INNER JOIN Rating USING(mId)
+6
+  WHERE year < 1980
+7
+  GROUP BY mId
+8
+) AS Before1980, (
+9
+  SELECT AVG(stars) AS avg
+10
+  FROM Movie
+11
+  INNER JOIN Rating USING(mId)
+12
+  WHERE year > 1980
+13
+  GROUP BY mId
+14
+) AS After1980;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+You've started a new movie-rating website, and you've been collecting data on reviewers' ratings of various movies. There's not much data yet, but you can still try out some interesting queries. Here's the schema:
+
+Movie ( mID, title, year, director )
+English: There is a movie with ID number mID, a title, a release year, and a director.
+
+Reviewer ( rID, name )
+English: The reviewer with ID number rID has a certain name.
+
+Rating ( rID, mID, stars, ratingDate )
+English: The reviewer rID gave the movie mID a number of stars rating (1-5) on a certain ratingDate.
+
+Your queries will run over a small data set conforming to the schema. View the database. (You can also download the schema and data.)
+
+Instructions: Each problem asks you to write a query in SQL. To run your query against our back-end sample database using SQLite, click the "Submit" button. You will see a display of your query result and the expected result. If the results match, your query will be marked "correct". You may run as many queries as you like for each question.
+
+Important Notes:
+
+Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+Unless a specific result ordering is asked for, you can return the result rows in any order.
+You are to translate the English into a SQL query that computes the desired result over all possible databases. All we actually check is that your query gets the right answer on the small sample database. Thus, even if your solution is marked as correct, it is possible that your query does not correctly reflect the problem at hand. (For example, if we ask for a complex condition that requires accessing all of the tables, but over our small data set in the end the condition is satisfied only by Star Wars, then the query "select title from Movie where title = 'Star Wars'" will be marked correct even though it doesn't reflect the actual question.) Circumventing the system in this fashion will get you a high score on the exercises, but it won't help you learn SQL. On the other hand, an incorrect attempt at a general solution is unlikely to produce the right answer, so you shouldn't be led astray by our checking system.
+
+You may perform these exercises as many times as you like, so we strongly encourage you to keep working with them until you complete the exercises with full credit.
+
+Q1
+0 points (ungraded)
+Find the names of all reviewers who rated Gone with the Wind.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT DISTINCT name
+2
+FROM Movie
+3
+INNER JOIN Rating USING(mId)
+4
+INNER JOIN Reviewer USING(rId)
+5
+WHERE title = "Gone with the Wind";
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q2
+0 points (ungraded)
+For any rating where the reviewer is the same as the director of the movie, return the reviewer name, movie title, and number of stars.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT name, title, stars
+2
+FROM Movie
+3
+INNER JOIN Rating USING(mId)
+4
+INNER JOIN Reviewer USING(rId)
+5
+WHERE director = name;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q3
+0 points (ungraded)
+Return all reviewer names and movie names together in a single list, alphabetized. (Sorting by the first name of the reviewer and first word in the title is fine; no need for special processing on last names or removing "The".)
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT title FROM Movie
+2
+UNION
+3
+SELECT name FROM Reviewer
+4
+ORDER BY name, title;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q4
+0 points (ungraded)
+Find the titles of all movies not reviewed by Chris Jackson.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT title
+2
+FROM Movie
+3
+WHERE mId NOT IN (
+4
+  SELECT mId
+5
+  FROM Rating
+6
+  INNER JOIN Reviewer USING(rId)
+7
+  WHERE name = "Chris Jackson"
+8
+);
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q5
+0 points (ungraded)
+For all pairs of reviewers such that both reviewers gave a rating to the same movie, return the names of both reviewers. Eliminate duplicates, don't pair reviewers with themselves, and include each pair only once. For each pair, return the names in the pair in alphabetical order.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT DISTINCT Re1.name, Re2.name
+2
+FROM Rating R1, Rating R2, Reviewer Re1, Reviewer Re2
+3
+WHERE R1.mID = R2.mID
+4
+AND R1.rID = Re1.rID
+5
+AND R2.rID = Re2.rID
+6
+AND Re1.name < Re2.name
+7
+ORDER BY Re1.name, Re2.name;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q6
+0 points (ungraded)
+For each rating that is the lowest (fewest stars) currently in the database, return the reviewer name, movie title, and number of stars.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT name, title, stars
+2
+FROM Movie
+3
+INNER JOIN Rating USING(mId)
+4
+INNER JOIN Reviewer USING(rId)
+5
+WHERE stars = (SELECT MIN(stars) FROM Rating);
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q7
+0 points (ungraded)
+List movie titles and average ratings, from highest-rated to lowest-rated. If two or more movies have the same average rating, list them in alphabetical order.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT title, AVG(stars) AS average
+2
+FROM Movie
+3
+INNER JOIN Rating USING(mId)
+4
+GROUP BY mId
+5
+ORDER BY average DESC, title;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q8
+0 points (ungraded)
+Find the names of all reviewers who have contributed three or more ratings. (As an extra challenge, try writing the query without HAVING or without COUNT.)
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT name
+2
+FROM Reviewer
+3
+INNER JOIN Rating USING(rId)
+4
+GROUP BY rId
+5
+HAVING COUNT(*) >= 3;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q9
+0 points (ungraded)
+Some directors directed more than one movie. For all such directors, return the titles of all movies directed by them, along with the director name. Sort by director name, then movie title. (As an extra challenge, try writing the query both with and without COUNT.)
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT title, director
+2
+FROM Movie M1
+3
+WHERE (SELECT COUNT(*) FROM Movie M2 WHERE M1.director = M2.director) > 1
+4
+ORDER BY director, title;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q10
+0 points (ungraded)
+Find the movie(s) with the highest average rating. Return the movie title(s) and average rating. (Hint: This query is more difficult to write in SQLite than other systems; you might think of it as finding the highest average rating and then choosing the movie(s) with that average rating.)
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT title, AVG(stars) AS average
+2
+FROM Movie
+3
+INNER JOIN Rating USING(mId)
+4
+GROUP BY mId
+5
+HAVING average = (
+6
+  SELECT MAX(average_stars)
+7
+  FROM (
+8
+    SELECT title, AVG(stars) AS average_stars
+9
+    FROM Movie
+10
+    INNER JOIN Rating USING(mId)
+11
+    GROUP BY mId
+12
+  )
+13
+);
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q11
+0 points (ungraded)
+Find the movie(s) with the lowest average rating. Return the movie title(s) and average rating. (Hint: This query may be more difficult to write in SQLite than other systems; you might think of it as finding the lowest average rating and then choosing the movie(s) with that average rating.)
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT title, AVG(stars) AS average
+2
+FROM Movie
+3
+INNER JOIN Rating USING(mId)
+4
+GROUP BY mId
+5
+HAVING average = (
+6
+  SELECT MIN(average_stars)
+7
+  FROM (
+8
+    SELECT title, AVG(stars) AS average_stars
+9
+    FROM Movie
+10
+    INNER JOIN Rating USING(mId)
+11
+    GROUP BY mId
+12
+  )
+13
+);
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q12
+0 points (ungraded)
+For each director, return the director's name together with the title(s) of the movie(s) they directed that received the highest rating among all of their movies, and the value of that rating. Ignore movies whose director is NULL.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT director, title, MAX(stars)
+2
+FROM Movie
+3
+INNER JOIN Rating USING(mId)
+4
+WHERE director IS NOT NULL
+5
+GROUP BY director;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Students at your hometown high school have decided to organize their social network using databases. So far, they have collected information about sixteen students in four grades, 9-12. Here's the schema:
+
+Highschooler ( ID, name, grade )
+English: There is a high school student with unique ID and a given first name in a certain grade.
+
+Friend ( ID1, ID2 )
+English: The student with ID1 is friends with the student with ID2. Friendship is mutual, so if (123, 456) is in the Friend table, so is (456, 123).
+
+Likes ( ID1, ID2 )
+English: The student with ID1 likes the student with ID2. Liking someone is not necessarily mutual, so if (123, 456) is in the Likes table, there is no guarantee that (456, 123) is also present.
+
+Your queries will run over a small data set conforming to the schema. View the database -https://courses.edx.org/asset-v1:StanfordOnline+SOE.YDB-SQL0001+2T2020+type@asset+block/socialdata.html. (You can also download the schema and data - https://s3-us-west-2.amazonaws.com/prod-c2g/db/Winter2013/files/social.sql.)
+
+For your convenience, here is a graph showing the various connections between the students in our database. 9th graders are blue, 10th graders are green, 11th graders are yellow, and 12th graders are purple. Undirected black edges indicate friendships, and directed red edges indicate that one student likes another student.
+
+Social graph
+
+
+Instructions: Each problem asks you to write a query in SQL. To run your query against our back-end sample database using SQLite, click the "Submit" button. You will see a display of your query result and the expected result. If the results match, your query will be marked "correct". You may run as many queries as you like for each question.
+
+Important Notes:
+
+Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+Unless a specific result ordering is asked for, you can return the result rows in any order.
+You are to translate the English into a SQL query that computes the desired result over all possible databases. All we actually check is that your query gets the right answer on the small sample database. Thus, even if your solution is marked as correct, it is possible that your query does not correctly reflect the problem at hand. (For example, if we ask for a complex condition that requires accessing all of the tables, but over our small data set in the end the condition is satisfied only by Star Wars, then the query "select title from Movie where title = 'Star Wars'" will be marked correct even though it doesn't reflect the actual question.) Circumventing the system in this fashion will get you a high score on the exercises, but it won't help you learn SQL. On the other hand, an incorrect attempt at a general solution is unlikely to produce the right answer, so you shouldn't be led astray by our checking system.
+
+You may perform these exercises as many times as you like, so we strongly encourage you to keep working with them until you complete the exercises with full credit.
+
+Q1
+1/1 point (graded)
+Find the names of all students who are friends with someone named Gabriel.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+select name 
+2
+from Highschooler
+3
+where id in (
+4
+  select ID1 from friend where id1 = id and
+5
+  id2 IN (select id from Highschooler where name="Gabriel")
+6
+)
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q2
+1/1 point (graded)
+For every student who likes someone 2 or more grades younger than themselves, return that student's name and grade, and the name and grade of the student they like.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+select h1.name, h1.grade, h2.name, h2.grade
+2
+from highschooler as h1
+3
+join likes as l on l.id1 = h1.id
+4
+join highschooler as h2 on h2.id = l.id2
+5
+where h2.grade <= h1.grade - 2
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q3
+1/1 point (graded)
+For every pair of students who both like each other, return the name and grade of both students. Include each pair only once, with the two names in alphabetical order.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT H1.name, H1.grade, H2.name, H2.grade
+2
+FROM Highschooler H1, Highschooler H2, Likes L1, Likes L2
+3
+WHERE (H1.ID = L1.ID1 AND H2.ID = L1.ID2) AND (H2.ID = L2.ID1 AND H1.ID = L2.ID2) AND H1.name < H2.name
+4
+ORDER BY H1.name, H2.name;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q4
+1/1 point (graded)
+Find all students who do not appear in the Likes table (as a student who likes or is liked) and return their names and grades. Sort by grade, then by name within each grade.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT name, grade
+2
+FROM Highschooler
+3
+WHERE ID NOT IN (
+4
+  SELECT DISTINCT ID1
+5
+  FROM Likes
+6
+  UNION
+7
+  SELECT DISTINCT ID2
+8
+  FROM Likes
+9
+)
+10
+ORDER BY grade, name;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q5
+1/1 point (graded)
+For every situation where student A likes student B, but we have no information about whom B likes (that is, B does not appear as an ID1 in the Likes table), return A and B's names and grades.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT H1.name, H1.grade, H2.name, H2.grade
+2
+FROM Highschooler H1
+3
+INNER JOIN Likes ON H1.ID = Likes.ID1
+4
+INNER JOIN Highschooler H2 ON H2.ID = Likes.ID2
+5
+WHERE (H1.ID = Likes.ID1 AND H2.ID = Likes.ID2) AND H2.ID NOT IN (
+6
+  SELECT DISTINCT ID1
+7
+  FROM Likes
+8
+);
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q6
+1/1 point (graded)
+Find names and grades of students who only have friends in the same grade. Return the result sorted by grade, then by name within each grade.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT name, grade
+2
+FROM Highschooler H1
+3
+WHERE ID NOT IN (
+4
+  SELECT ID1
+5
+  FROM Friend, Highschooler H2
+6
+  WHERE H1.ID = Friend.ID1 AND H2.ID = Friend.ID2 AND H1.grade <> H2.grade
+7
+)
+8
+ORDER BY grade, name;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q7
+1/1 point (graded)
+For each student A who likes a student B where the two are not friends, find if they have a friend C in common (who can introduce them!). For all such trios, return the name and grade of A, B, and C.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT DISTINCT H1.name, H1.grade, H2.name, H2.grade, H3.name, H3.grade
+2
+FROM Highschooler H1, Highschooler H2, Highschooler H3, Likes L, Friend F1, Friend F2
+3
+WHERE (H1.ID = L.ID1 AND H2.ID = L.ID2) AND H2.ID NOT IN (
+4
+  SELECT ID2
+5
+  FROM Friend
+6
+  WHERE ID1 = H1.ID
+7
+) AND (H1.ID = F1.ID1 AND H3.ID = F1.ID2) AND (H2.ID = F2.ID1 AND H3.ID = F2.ID2);
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q8
+1/1 point (graded)
+Find the difference between the number of students in the school and the number of different first names.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT COUNT(*) - COUNT(DISTINCT name)
+2
+FROM Highschooler;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q9
+1/1 point (graded)
+Find the name and grade of all students who are liked by more than one other student.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT name, grade
+2
+FROM Highschooler
+3
+INNER JOIN Likes ON Highschooler.ID = Likes.ID2
+4
+GROUP BY ID2
+5
+HAVING COUNT(*) > 1;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Students at your hometown high school have decided to organize their social network using databases. So far, they have collected information about sixteen students in four grades, 9-12. Here's the schema:
+
+Highschooler ( ID, name, grade )
+English: There is a high school student with unique ID and a given first name in a certain grade.
+
+Friend ( ID1, ID2 )
+English: The student with ID1 is friends with the student with ID2. Friendship is mutual, so if (123, 456) is in the Friend table, so is (456, 123).
+
+Likes ( ID1, ID2 )
+English: The student with ID1 likes the student with ID2. Liking someone is not necessarily mutual, so if (123, 456) is in the Likes table, there is no guarantee that (456, 123) is also present.
+
+Your queries will run over a small data set conforming to the schema. View the database. (You can also download the schema and data.)
+
+For your convenience, here is a graph showing the various connections between the students in our database. 9th graders are blue, 10th graders are green, 11th graders are yellow, and 12th graders are purple. Undirected black edges indicate friendships, and directed red edges indicate that one student likes another student.
+
+Social graph
+
+
+Instructions: Each problem asks you to write a query in SQL. When you click "Check Answer" our back-end runs your query against the sample database using SQLite. It displays the result and compares your answer against the correct one. When you're satisfied with your solution for a given problem, click the "Save Answers" button to save your progress. Click "Submit Answers" to submit the entire exercise set.
+
+Important Notes:
+
+Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+Unless a specific result ordering is asked for, you can return the result rows in any order.
+You are to translate the English into a SQL query that computes the desired result over all possible databases. All we actually check is that your query gets the right answer on the small sample database. Thus, even if your solution is marked as correct, it is possible that your query does not correctly reflect the problem at hand. (For example, if we ask for a complex condition that requires accessing all of the tables, but over our small data set in the end the condition is satisfied only by Star Wars, then the query "select title from Movie where title = 'Star Wars'" will be marked correct even though it doesn't reflect the actual question.) Circumventing the system in this fashion will get you a high score on the exercises, but it won't help you learn SQL. On the other hand, an incorrect attempt at a general solution is unlikely to produce the right answer, so you shouldn't be led astray by our checking system.
+
+You may perform these exercises as many times as you like, so we strongly encourage you to keep working with them until you complete the exercises with full credit.
+
+Q1
+0 points (ungraded)
+For every situation where student A likes student B, but student B likes a different student C, return the names and grades of A, B, and C.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT H1.name, H1.grade, H2.name, H2.grade, H3.name, H3.grade
+2
+FROM Highschooler H1, Highschooler H2, Highschooler H3, Likes L1, Likes L2
+3
+WHERE H1.ID = L1.ID1 AND H2.ID = L1.ID2 AND (H2.ID = L2.ID1 AND H3.ID = L2.ID2 AND H3.ID <> H1.ID);
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q2
+0 points (ungraded)
+Find those students for whom all of their friends are in different grades from themselves. Return the students' names and grades.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT name, grade
+2
+FROM Highschooler H1
+3
+WHERE grade NOT IN (
+4
+  SELECT H2.grade
+5
+  FROM Friend, Highschooler H2
+6
+  WHERE H1.ID = Friend.ID1 AND H2.ID = Friend.ID2
+7
+);
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q3
+0 points (ungraded)
+What is the average number of friends per student? (Your result should be just one number.)
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT AVG(count)
+2
+FROM (
+3
+  SELECT COUNT(*) AS count
+4
+  FROM Friend
+5
+  GROUP BY ID1
+6
+);
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q4
+0 points (ungraded)
+Find the number of students who are either friends with Cassandra or are friends of friends of Cassandra. Do not count Cassandra, even though technically she is a friend of a friend.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT COUNT(*)
+2
+FROM Friend
+3
+WHERE ID1 IN (
+4
+  SELECT ID2
+5
+  FROM Friend
+6
+  WHERE ID1 IN (
+7
+    SELECT ID
+8
+    FROM Highschooler
+9
+    WHERE name = 'Cassandra'
+10
+  )
+11
+);
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q5
+0 points (ungraded)
+Find the name and grade of the student(s) with the greatest number of friends.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+SELECT name, grade
+2
+FROM Highschooler
+3
+INNER JOIN Friend ON Highschooler.ID = Friend.ID1
+4
+GROUP BY ID1
+5
+HAVING COUNT(*) = (
+6
+  SELECT MAX(count)
+7
+  FROM (
+8
+    SELECT COUNT(*) AS count
+9
+    FROM Friend
+10
+    GROUP BY ID1
+11
+  )
+12
+);
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+SQL Movie-Rating Modification Exercises
+
+You've started a new movie-rating website, and you've been collecting data on reviewers' ratings of various movies. There's not much data yet, but you can still try out some data modifications. Here's the schema:
+
+Movie ( mID, title, year, director )
+English: There is a movie with ID number mID, a title, a release year, and a director.
+
+Reviewer ( rID, name )
+English: The reviewer with ID number rID has a certain name.
+
+Rating ( rID, mID, stars, ratingDate )
+English: The reviewer rID gave the movie mID a number of stars rating (1-5) on a certain ratingDate.
+
+Your modifications will run over a small data set conforming to the schema. View the database. (You can also download the schema and data.)
+
+Instructions: You are to write each of the following data modification commands using SQL. Our back-end runs each modification using SQLite on the original state of the sample database. It then performs a query over the modified database to check whether your command made the correct modification, and restores the database to its original state. 
+
+You may perform these exercises as many times as you like, so we strongly encourage you to keep working with them until you complete the exercises with full credit.
+
+Q1
+1/1 point (graded)
+Add the reviewer Roger Ebert to your database, with an rID of 209.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+INSERT INTO reviewer
+2
+(
+3
+  rID, name
+4
+)
+5
+VALUES
+6
+(
+7
+  209, 'Roger Ebert'
+8
+);
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+To check your data modification statement for Q1, we ran the following query after your modification: select * from Reviewer order by rID, name
+
+Q2
+1/1 point (graded)
+For all movies that have an average rating of 4 stars or higher, add 25 to the release year. (Update the existing tuples; don't insert new tuples.)
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+UPDATE movie
+2
+SET year = year + 25
+3
+WHERE movie.mid IN
+4
+(
+5
+    SELECT avg_table.mid
+6
+    FROM
+7
+    (
+8
+        SELECT mov.mid, AVG(rat.stars)
+9
+        FROM movie AS mov, rating AS rat
+10
+        WHERE mov.mid = rat.mid
+11
+        GROUP BY mov.mid
+12
+        HAVING AVG(rat.stars) >= 4
+13
+    ) AS avg_table
+14
+);
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+To check your data modification statement for Q2, we ran the following query after your modification: select * from Movie order by mID
+
+Q3
+1/1 point (graded)
+Remove all ratings where the movie's year is before 1970 or after 2000, and the rating is fewer than 4 stars.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+DELETE FROM rating
+2
+WHERE rating.mid IN
+3
+(
+4
+    SELECT mov.mid
+5
+    FROM movie AS mov
+6
+    WHERE mov.year < 1970
+7
+    OR mov.year > 2000
+8
+)
+9
+AND rating.stars < 4;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+To check your data modification statement for Q3, we ran the following query after your modification: select R.rID, R.mID, R.stars, M.title, M.year from Rating R join Movie M on (R.mID = M.mID) order by R.rID, R.mID
+
+SQL Social-Network Modification Exercises
+
+Students at your hometown high school have decided to organize their social network using databases. So far, they have collected information about sixteen students in four grades, 9-12. Here's the schema:
+
+Highschooler ( ID, name, grade )
+English: There is a high school student with unique ID and a given first name in a certain grade.
+
+Friend ( ID1, ID2 )
+English: The student with ID1 is friends with the student with ID2. Friendship is mutual, so if (123, 456) is in the Friend table, so is (456, 123).
+
+Likes ( ID1, ID2 )
+English: The student with ID1 likes the student with ID2. Liking someone is not necessarily mutual, so if (123, 456) is in the Likes table, there is no guarantee that (456, 123) is also present.
+
+Your modifications will run over a small data set conforming to the schema. View the database. (You can also download the schema and data.)
+
+For your convenience, here is a graph showing the various connections between the people in our database. 9th graders are blue, 10th graders are green, 11th graders are yellow, and 12th graders are purple. Undirected black edges indicate friendships, and directed red edges indicate that one person likes another person.
+
+Social graph
+
+
+Instructions: You are to write each of the following data modification commands using SQL. Our back-end runs each modification using SQLite on the original state of the sample database. It then performs a query over the modified database to check whether your command made the correct modification, and restores the database to its original state. 
+
+You may perform these exercises as many times as you like, so we strongly encourage you to keep working with them until you complete the exercises with full credit.
+
+Q1
+1/1 point (graded)
+It's time for the seniors to graduate. Remove all 12th graders from Highschooler.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+DELETE FROM highschooler
+2
+WHERE grade = 12;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q2
+1/1 point (graded)
+If two students A and B are friends, and A likes B but not vice-versa, remove the Likes tuple.
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+DELETE FROM likes
+2
+WHERE likes.id1 IN
+3
+(
+4
+    SELECT f.id2
+5
+    FROM friend AS f
+6
+    WHERE f.id1 = likes.id2
+7
+)
+8
+AND likes.id2 IN
+9
+(
+10
+    SELECT l.id2
+11
+    FROM likes AS l
+12
+    WHERE l.id1 = likes.id1
+13
+)
+14
+AND likes.id1 NOT IN
+15
+(
+16
+    SELECT l.id2
+17
+    FROM likes AS l
+18
+    WHERE l.id1 = likes.id2
+19
+);
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
+
+Q3
+1/1 point (graded)
+For all cases where A is friends with B, and B is friends with C, add a new friendship for the pair A and C. Do not add duplicate friendships, friendships that already exist, or friendships with oneself. (This one is a bit challenging; congratulations if you get it right.)
+
+Note: Your queries are executed using SQLite, so you must conform to the SQL constructs supported by SQLite.
+1
+INSERT INTO friend (id1, id2)
+2
+SELECT DISTINCT f1.id1 AS id1, f3.id1 AS id2
+3
+FROM friend AS f1, friend AS f2, friend AS f3
+4
+WHERE f2.id1 IN
+5
+(
+6
+    SELECT friend.id2
+7
+    FROM friend
+8
+    WHERE friend.id1 = f1.id1
+9
+)
+10
+AND f2.id1 IN
+11
+(
+12
+    SELECT friend.id2
+13
+    FROM friend
+14
+    WHERE friend.id1 = f3.id1
+15
+)
+16
+AND f3.id1 NOT IN
+17
+(
+18
+    SELECT friend.id2
+19
+    FROM friend
+20
+    WHERE friend.id1 = f1.id1
+21
+)
+22
+AND f1.id1 != f3.id1;
+Press ESC then TAB or click outside of the code editor to exit
+Submit
+Correct
